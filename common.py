@@ -169,3 +169,9 @@ service_id_mappings = {
                  371],
              6: [81, 162, 318, 325, 344, 358]}
 }
+
+k_nearest_mappings = {
+    "bus": 15,
+    "dart": 5,
+    "luas": 5
+}
