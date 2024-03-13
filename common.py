@@ -8,10 +8,10 @@ road_raw_data_file_name = "data/.road_overpass.json"
 road_processed_data_file_name = "data/road_map.json"
 
 average_speeds = {
-    "walking": 4,  # Average walking speed in km/h
-    "bus": 15,  # Average bus speed in km/h, can vary greatly depending on city and traffic
-    "tram": 25,  # Average tram speed in km/h, depends on stops and city
-    "train": 60  # Average train speed in km/h, can be much higher for high-speed trains
+    "walking": 4,
+    "bus": 15,
+    "luas": 25,
+    "dart": 60
 }
 
 service_id_mappings = {
