@@ -3,7 +3,7 @@ import json
 
 def get_geojson(start_coordinate, end_coordinate, bus_start_coordinate, bus_end_coordinate,
                 start_walk_route, bus_route, end_walk_route):
-    with open("data/geojson-template.json", "r") as file:
+    with open("data/geojson-template", "r") as file:
         template = file.read()
 
         geojson_str = template.replace("{start_coordinate}", json.dumps(start_coordinate))
