@@ -134,28 +134,44 @@ def get_transit_routes(nearest_stops_start, nearest_stops_end, transit_map, mode
 
                     else:
                         # print(f"  {route_0} service_id_current: {service_id_current}")
-                        lowest_wait_time = timedelta(days=1)
+                        # lowest_wait_time = timedelta(days=1)
+                        # for time_str in transit_map[f"{mode}_stops"][prev]["routes"][route][service_id_current]:
+                        #     vehicle_time = parse_time(time_str)
+                        #     # If the vehicle time has already passed today, skip it
+                        #     if vehicle_time < time_now:
+                        #         continue
+                        #     wait_time = vehicle_time - time_now
+                        #     if wait_time < lowest_wait_time:
+                        #         lowest_wait_time = wait_time
+
+                        wait_times = []
                         for time_str in transit_map[f"{mode}_stops"][prev]["routes"][route][service_id_current]:
                             vehicle_time = parse_time(time_str)
                             # If the vehicle time has already passed today, skip it
                             if vehicle_time < time_now:
                                 continue
                             wait_time = vehicle_time - time_now
-                            if wait_time < lowest_wait_time:
-                                lowest_wait_time = wait_time
+                            # Instead of comparing, just add all future wait times to the list
+                            wait_times.append(wait_time.total_seconds() / 60)
 
-                        # compute rolling distance
-                        for transit_stop in transit_map[f"{mode}_routes"][route_0][i + 1:j + 1]:
-                            distance += haversine_distance(
-                                transit_map[f"{mode}_stops"][prev]["lat"],
-                                transit_map[f"{mode}_stops"][prev]["lon"],
-                                transit_map[f"{mode}_stops"][transit_stop]["lat"],
-                                transit_map[f"{mode}_stops"][transit_stop]["lon"],
-                            )
-                            trace.append(
-                                [transit_map[f"{mode}_stops"][transit_stop]["lat"], transit_map[f"{mode}_stops"][transit_stop]["lon"]])
-                            prev = transit_stop
-                        connected_solutions.append((start_stop, end_stop, route, distance, trace, (lowest_wait_time.total_seconds() / 60)))
+                        # Sort the list of wait times
+                        wait_times.sort()
+                        next_three_wait_times = wait_times[:3] if len(wait_times) >= 3 else wait_times
+
+                        #  only continue if there are actual timelines when bus arrives
+                        if next_three_wait_times:
+                            # compute rolling distance
+                            for transit_stop in transit_map[f"{mode}_routes"][route_0][i + 1:j + 1]:
+                                distance += haversine_distance(
+                                    transit_map[f"{mode}_stops"][prev]["lat"],
+                                    transit_map[f"{mode}_stops"][prev]["lon"],
+                                    transit_map[f"{mode}_stops"][transit_stop]["lat"],
+                                    transit_map[f"{mode}_stops"][transit_stop]["lon"],
+                                )
+                                trace.append(
+                                    [transit_map[f"{mode}_stops"][transit_stop]["lat"], transit_map[f"{mode}_stops"][transit_stop]["lon"]])
+                                prev = transit_stop
+                            connected_solutions.append((start_stop, end_stop, route, distance, trace, next_three_wait_times))
                         continue
 
             route_1 = route + "_1"
@@ -180,28 +196,44 @@ def get_transit_routes(nearest_stops_start, nearest_stops_end, transit_map, mode
 
                     else:
                         # print(f"  {route_0} service_id_current: {service_id_current}")
-                        lowest_wait_time = timedelta(days=1)
+                        # lowest_wait_time = timedelta(days=1)
+                        # for time_str in transit_map[f"{mode}_stops"][prev]["routes"][route][service_id_current]:
+                        #     vehicle_time = parse_time(time_str)
+                        #     # If the vehicle time has already passed today, skip it
+                        #     if vehicle_time < time_now:
+                        #         continue
+                        #     wait_time = vehicle_time - time_now
+                        #     if wait_time < lowest_wait_time:
+                        #         lowest_wait_time = wait_time
+
+                        wait_times = []
                         for time_str in transit_map[f"{mode}_stops"][prev]["routes"][route][service_id_current]:
                             vehicle_time = parse_time(time_str)
                             # If the vehicle time has already passed today, skip it
                             if vehicle_time < time_now:
                                 continue
                             wait_time = vehicle_time - time_now
-                            if wait_time < lowest_wait_time:
-                                lowest_wait_time = wait_time
+                            # Instead of comparing, just add all future wait times to the list
+                            wait_times.append(wait_time.total_seconds() / 60)
 
-                        # compute rolling distance
-                        for transit_stop in transit_map[f"{mode}_routes"][route_1][i + 1:j + 1]:
-                            distance += haversine_distance(
-                                transit_map[f"{mode}_stops"][prev]["lat"],
-                                transit_map[f"{mode}_stops"][prev]["lon"],
-                                transit_map[f"{mode}_stops"][transit_stop]["lat"],
-                                transit_map[f"{mode}_stops"][transit_stop]["lon"],
-                            )
-                            trace.append(
-                                [transit_map[f"{mode}_stops"][transit_stop]["lat"], transit_map[f"{mode}_stops"][transit_stop]["lon"]])
-                            prev = transit_stop
-                        connected_solutions.append((start_stop, end_stop, route, distance, trace, (lowest_wait_time.total_seconds() / 60)))
+                        # Sort the list of wait times
+                        wait_times.sort()
+                        next_three_wait_times = wait_times[:3] if len(wait_times) >= 3 else wait_times
+
+                        # only continue if there are actual timelines when bus arrives
+                        if next_three_wait_times:
+                            # compute rolling distance
+                            for transit_stop in transit_map[f"{mode}_routes"][route_1][i + 1:j + 1]:
+                                distance += haversine_distance(
+                                    transit_map[f"{mode}_stops"][prev]["lat"],
+                                    transit_map[f"{mode}_stops"][prev]["lon"],
+                                    transit_map[f"{mode}_stops"][transit_stop]["lat"],
+                                    transit_map[f"{mode}_stops"][transit_stop]["lon"],
+                                )
+                                trace.append(
+                                    [transit_map[f"{mode}_stops"][transit_stop]["lat"], transit_map[f"{mode}_stops"][transit_stop]["lon"]])
+                                prev = transit_stop
+                            connected_solutions.append((start_stop, end_stop, route, distance, trace, next_three_wait_times))
 
     return connected_solutions
 
