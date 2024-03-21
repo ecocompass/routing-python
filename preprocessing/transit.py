@@ -1,3 +1,4 @@
+import json
 import re
 
 import pandas as pd
@@ -55,59 +56,24 @@ def compute_route_and_stops(gtfs_type):
             data_structure[f"{gtfs_type}_routes"][route_key].append(row['stop_id'])
 
     # Processing shapes data
-    # print(f"\nProcessing '{gtfs_type}' shapes.", flush=True)
-    # for _, row in tqdm(shapes_df.iterrows(), total=shapes_df.shape[0], desc="Processing route shapes"):
-    #     shape_id = row['shape_id']
-    #     # Find a trip that uses this shape_id to get route_short_name and direction_id
-    #     trip_row = trips_df[trips_df['shape_id'] == shape_id].iloc[0]
-    #     route_short_name = routes_df[routes_df['route_id'] == trip_row['route_id']].iloc[0]['route_short_name']
-    #     route_key = f"{route_short_name}_{trip_row['direction_id']}"
-    #
-    #     if route_key not in data_structure[f"{gtfs_type}_shapes"]:
-    #         data_structure[f"{gtfs_type}_shapes"][route_key] = []
-    #
-    #     data_structure[f"{gtfs_type}_shapes"][route_key].append([row['shape_pt_lat'], row['shape_pt_lon']])
-    #
-    # # workaround to handle duplicate shapes in case of luas
-    # if gtfs_type != "bus":
-    #     print(f"\nWorkaround '{gtfs_type}' for shapes")
-    #     for route_key in data_structure[f"{gtfs_type}_shapes"]:
-    #         print("Processing route:", route_key)
-    #         prev, proc_shape, proc_shapes = None, [], []
-    #
-    #         for coord in data_structure[f"{gtfs_type}_shapes"][route_key]:
-    #             if prev:
-    #                 d = haversine_distance(*prev, *coord)
-    #                 if d > 10:
-    #                     proc_shapes.append(proc_shape)
-    #                     proc_shape = []
-    #                     print("split", prev, coord, d)
-    #                 else:
-    #                     proc_shape.append(coord)
-    #             prev = coord
-    #
-    #         # print("shape lengths")
-    #         # for shape in proc_shapes:
-    #         #     print("     ", len(shape))
-    #         data_structure[f"{gtfs_type}_shapes"][route_key] = max(proc_shapes, key=len)
+    print(f"\nProcessing '{gtfs_type}' shapes.", flush=True)
+    if gtfs_type == "luas":
+        with open("data/.luas_shapes.workaround.json", "r") as file:
+            luas_workaround = json.loads(file.read())
 
-    # Processing shapes data
-    if gtfs_type == "bus":
-        print(f"\nProcessing '{gtfs_type}' shapes.", flush=True)
-        # for route_id in data_structure[f"{gtfs_type}_routes"]
+            for route_key in luas_workaround:
+                data_structure[f"{gtfs_type}_shapes"][route_key] = luas_workaround[route_key]
+    else:
+        for _, row in tqdm(shapes_df.iterrows(), total=shapes_df.shape[0], desc="Processing route shapes"):
+            shape_id = row['shape_id']
+            # Find a trip that uses this shape_id to get route_short_name and direction_id
+            trip_row = trips_df[trips_df['shape_id'] == shape_id].iloc[0]
+            route_short_name = routes_df[routes_df['route_id'] == trip_row['route_id']].iloc[0]['route_short_name']
+            route_key = f"{route_short_name}_{trip_row['direction_id']}"
 
-        for _, row in tqdm(routes_df.iterrows(), total=merged_df.shape[0], desc="Processing route entries"):
-            route_short_name = row['route_short_name']
-            route_id = row["route_id"]
-            for direction_id in (0, 1):
-                route_key = f"{route_short_name}_{direction_id}"
+            if route_key not in data_structure[f"{gtfs_type}_shapes"]:
+                data_structure[f"{gtfs_type}_shapes"][route_key] = []
 
-                print("------->", route_key)
-
-                route_trips = trips_df[(trips_df['route_id'] == route_id) & (trips_df['direction_id'] == direction_id)]
-
-                shape_id = route_trips.iloc[0]['shape_id']
-                route_shape = shapes_df[shapes_df['shape_id'] == shape_id][['shape_pt_lat', 'shape_pt_lon']].values.tolist()
-                data_structure[f"{gtfs_type}_shapes"][route_id] = route_shape
+            data_structure[f"{gtfs_type}_shapes"][route_key].append([row['shape_pt_lat'], row['shape_pt_lon']])
 
     return data_structure
