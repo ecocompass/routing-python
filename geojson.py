@@ -15,3 +15,41 @@ def get_geojson(start_coordinate, end_coordinate, bus_start_coordinate, bus_end_
         geojson_str = geojson_str.replace("{end_walk_route}", json.dumps(end_walk_route))
 
         return geojson_str
+
+class GeoJSONBuilder:
+    def __init__(self):
+        self.data = {"type": "FeatureCollection", "features": []}
+
+    def add_point(self, color, coordinates):
+        self.data["features"].append({
+            "type": "Feature",
+            "properties": {
+                "color": color,
+                "marker-color": color,
+                "marker-size": "medium",
+                "marker-symbol": "circle"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": coordinates
+            }
+        })
+
+    def add_line(self, color, coordinates):
+        self.data["features"].append({
+            "type": "Feature",
+            "geometry": {
+                "type": "LineString",
+                "coordinates": coordinates
+            },
+            "properties": {
+                "color": color,
+                "stroke": color,
+                "stroke-width": 4,
+                "stroke-opacity": 1
+            }
+        })
+
+    def to_string(self):
+        return json.dumps(self.data, indent=4)
+
