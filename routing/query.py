@@ -299,6 +299,7 @@ class Query:
                                 f"\n        End offset: {bus_route['end_offset']}\n")
                             bus_routes_to_start_.append(bus_route)
                 if bus_routes_to_start_:
+                    bus_routes_to_start_ = sorted(bus_routes_to_start_, key=lambda bus_route: bus_route["total_distance"])
                     luas_sol.append(bus_routes_to_start_[0])
                 luas_sol.append(luas_route)
 
@@ -314,6 +315,8 @@ class Query:
                                 f"\n        End offset: {bus_route['end_offset']}\n")
                             bus_routes_to_end_.append(bus_route)
                 if bus_routes_to_end_:
+                    bus_routes_to_end_ = sorted(bus_routes_to_end_,
+                                                  key=lambda bus_route: bus_route["total_distance"])
                     luas_sol.append(bus_routes_to_end_[0])
                 luas_sols.append(luas_sol)
 
