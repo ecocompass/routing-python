@@ -14,7 +14,6 @@ def compute_route_and_stops(gtfs_type):
     trips_df = pd.read_csv("data/" + gtfs_type + '_gtfs/trips.csv')
     stop_times_df = pd.read_csv("data/" + gtfs_type + '_gtfs/stop_times.csv')
     routes_df = pd.read_csv("data/" + gtfs_type + '_gtfs/routes.csv')
-    shapes_df = pd.read_csv("data/" + gtfs_type + '_gtfs/shapes.csv')
     print("Files read successfully. Processing data...")
 
     data_structure = {f"{gtfs_type}_stops": {}, f"{gtfs_type}_routes": {}, f"{gtfs_type}_shapes": {}}
@@ -91,6 +90,7 @@ def compute_route_and_stops(gtfs_type):
                 data_structure[f"{gtfs_type}_shapes"][route_key] = dart_workaround[route_key]
 
     else:
+        shapes_df = pd.read_csv("data/" + gtfs_type + '_gtfs/shapes.csv')
         for _, row in tqdm(shapes_df.iterrows(), total=shapes_df.shape[0], desc="Processing route shapes"):
             shape_id = row['shape_id']
             # Find a trip that uses this shape_id to get route_short_name and direction_id
